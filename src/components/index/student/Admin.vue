@@ -3,18 +3,26 @@
     <header>
       <div class="title">后台管理系统</div>
       <div class="content">
-        <img src="../../../assets/logo.png" width="40px"/>
-        <span>xla</span>
-        <el-button type="text">退出登录</el-button>
+        <el-dropdown trigger="click">
+      <span class="el-dropdown-link">
+        {{userName}}<i class="el-icon--right"></i>
+        <img src="../../../assets/user.png">
+      </span>
+          <el-dropdown-menu slot="dropdown">
+            <!--<el-dropdown-item><el-button type="text">个人信息</el-button></el-dropdown-item>-->
+            <el-dropdown-item><el-button type="text" @click="updatePwd">修改密码</el-button></el-dropdown-item>
+            <el-dropdown-item><el-button type="text" @click="logout">退出登录</el-button></el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
     </header>
     <main>
       <!-- 左侧导航 -->
       <div class="main-left">
-        <el-menu default-active="/message" class="el-menu-vertical-demo" :router="true">
-          <el-menu-item index="/message" :class="{'isActive': active}">个人信息</el-menu-item>
-          <el-menu-item index="/topic" :class="{'isActive': !active}">话题管理</el-menu-item>
-          <el-menu-item index="/answer" :class="{'isActive': !active}">在线提问</el-menu-item>
+        <el-menu default-active="/manage/student/topic" class="el-menu-vertical-demo" :router="true">
+          <el-menu-item index="/manage/student/topic" >个人话题管理</el-menu-item>
+          <el-menu-item index="/manage/student/answer" >在线提问</el-menu-item>
+          <el-menu-item index="/manage/student/publicTopic">所有话题</el-menu-item>
         </el-menu>
       </div>
 
@@ -33,23 +41,37 @@
     name: 'student',
     data: function () {
       return {
-        active: true,
         headerFixed: true,
         collapsed: '',
-        sysName: '系统管理员'
+        userName: ''
       }
     },
     created: function () {
-      this.$router.push({path: '/message'})
+      this.$router.push('/manage/student/topic')
+      if (sessionStorage.getItem('user') !== null) {
+        this.userName = JSON.parse(sessionStorage.getItem('user')).name
+      }
     },
     methods: {
-
+      logout: function () {
+        this.$confirm('确认要退出登录？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          sessionStorage.clear()
+          this.$router.push({path: '/login'})
+        }).catch(() => { })
+      },
+      updatePwd: function () {
+        this.$router.push({path: '/manage/student/message'})
+      }
     },
     watch: {
       '$route': function (to, from) {
-        if (to.path === '/message') {
+        if (to.path === '/manage/student/topic') {
           this.active = true
-        } else if (to.path === '/topic') {
+        } else if (to.path === '/manage/student/answer') {
           this.active = false
         }
       }

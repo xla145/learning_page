@@ -3,15 +3,22 @@
     <div class="action">
       <el-button type="primary" size="small" @click="add"><i class="el-icon-plus">&nbsp;添加</i></el-button>
       <el-button type="danger" size="small" @click="deleteRec()">批量删除</el-button>
+      <el-upload
+        class="upload-demo"
+        :action='_uploadTeacherFilePath'
+        :before-upload="beforeAvatarUpload"
+        :on-success="getData">
+        <el-button size="small" type="primary">点击上传</el-button>
+      </el-upload>
     </div>
     <el-table :data="tableData" @row-dblclick="edit" border highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" :default-sort="orderInfo" @sort-change="sortChange">
       <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="id" label="ID" width="80"></el-table-column>
-      <el-table-column prop="title" label="标题" width="200"></el-table-column>
+      <el-table-column type="index" label="序号" width="80"></el-table-column>
+      <el-table-column prop="name" label="名字" width="120"></el-table-column>
+      <el-table-column prop="teacher_id" label="账号" min-width="120"></el-table-column>
       <el-table-column sortable prop="update_time" label="更新日期" width="180"></el-table-column>
       <el-table-column sortable prop="create_time" label="创建日期" width="180"></el-table-column>
-      <el-table-column prop="status" label="状态" width="170" :formatter="fmtstatus" ></el-table-column>
-      <el-table-column label="操作" width="250" fixed="right">
+      <el-table-column label="操作" width="150" fixed="right">
         <template scope="scope">
           <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
           <el-button @click="deleteRec([scope.row.id])" type="text" size="small" class="delete">删除</el-button>
@@ -27,30 +34,23 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="pageInfo.totalRec" class="table-pager">
     </el-pagination>
-    <!--<component :is="editCompName" v-model="showEdit" :editRowId="editRowId"></component>-->
   </div>
 </template>
 
 <script>
-import bus, {topic} from '../../common/bus.js'
+import bus, {teacher} from '../../common/bus.js'
 import {localStorageKeys} from '../../common/const.js'
 
 export default {
-//  components: {
-//  // tableForm: resolve => require(['./AddOrEdit'], resolve) // 必须用下面的方式加载，否则会出现组件加载完成后立即销毁（一闪而过）
-//    tableForm: resolve => {
-//      require(['./AddOrEdit'], resolve)
-//    }
-//  },
   created: function () {
     // 监听外部查询数据事件
-    bus.$on(topic.search, (searchData) => {
+    bus.$on(teacher.search, (searchData) => {
       this.search(searchData)
     })
-    bus.$on(topic.refreshListForEdit, () => { // 监听数据更改后的列表刷新（刷新当前页）
+    bus.$on(teacher.refreshListForEdit, () => { // 监听数据更改后的列表刷新（刷新当前页）
       this.getData()
     })
-    bus.$on(topic.refreshListForAdd, () => { // 监听数据添加后的列表刷新
+    bus.$on(teacher.refreshListForAdd, () => { // 监听数据添加后的列表刷新
       this.resetPageInfo()
       this.orderInfo.prop = 'create_time'
       this.orderInfo.order = 'descending'
@@ -58,17 +58,17 @@ export default {
     })
   },
   data: function () {
-    let pageSize = localStorage.getItem(localStorageKeys.topicPageSize)
+    let pageSize = localStorage.getItem(localStorageKeys.replyPageSize)
     return {
-      editCompName: '', // 用于动态加载编辑组件
-      showEdit: false, // 是否展示编辑弹窗
-      editRowId: null, // 编辑的记录ID
+      isDisabled: false,
+      isRead: true,
       pageInfo: {
         pageNum: 1,
         totalRec: 250,
         pageSize: pageSize == null ? 10 : parseInt(pageSize)
       },
-      searchData: {},
+      searchData: {
+      },
       orderInfo: {prop: 'create_time', order: 'descending'},
       tableData: [],
       selectIds: []
@@ -88,19 +88,16 @@ export default {
     },
     // 获取服务器数据
     getData: function () {
-      this.$http.post('/manage/topic/getData', Object.assign({}, this.searchData, this.pageInfo, this.orderInfo)).then((response) => {
+      this.$http.post('/manage/teacher/getData', Object.assign({}, this.searchData, this.pageInfo, this.orderInfo)).then((response) => {
         this.pageInfo.totalRec = response.data.totalRow
         this.tableData = response.data.list
       })
     },
     // 设置某条记录可编辑
     edit: function (row) {
-      bus.$emit(topic.showAddOrEdit, row.id) // 1：打开弹窗
-//      this.editCompName = 'tableForm'
-//      this.editRowId = row.id
-//      this.showEdit = true
+      bus.$emit(teacher.showAddOrEdit, row.id) // 1：打开弹窗
     },
-    // 删除话题
+    // 删除学生记录
     deleteRec: function (selectIds) {
       selectIds = selectIds || this.selectIds
       if (selectIds.length === 0) {
@@ -113,7 +110,7 @@ export default {
         type: 'warning'
       }).then(() => {
 //        console.log(selectIds)
-        this.$http.post('/manage/topic/delete', Object.assign({}, {topicId: selectIds})).then((response) => {
+        this.$http.post('/manage/teacher/delete', Object.assign({}, {ids: selectIds})).then((response) => {
           this.$message({
             type: 'success',
             message: '删除成功!'
@@ -123,7 +120,7 @@ export default {
       }).catch(() => { })
     },
     add: function () { // 添加记录
-      bus.$emit(topic.showAddOrEdit)// 1：打开弹窗
+      bus.$emit(teacher.showAddOrEdit)// 1：打开弹窗
 //      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 //      this.editCompName = 'tableForm'
 //      this.editRowId = null
@@ -131,7 +128,7 @@ export default {
     },
     handleSizeChange: function (val) { // 每页条数改变时重新加载记录
       this.pageInfo.pageSize = val
-      localStorage.setItem(localStorageKeys.topicPageSize, val)
+      localStorage.setItem(localStorageKeys.replyPageSize, val)
       this.getData()
     },
     handleCurrentChange: function (val) { // 页码改变时重新加载记录
@@ -144,13 +141,6 @@ export default {
         this.selectIds.push(selectRows[i].id)
       }
     },
-    fmtstatus: function (row, column) {
-      var status
-      if (row.status === 0) {
-        status = '发布中'
-      }
-      return status
-    },
     sortChange: function ({column, prop, order}) { // 排序改变
       if (prop === this.orderInfo.prop && order === this.orderInfo.order) {
         return
@@ -159,6 +149,18 @@ export default {
       this.orderInfo.order = order
       this.resetPageInfo()
       this.getData()
+    },
+    beforeAvatarUpload (file) {
+      console.log(file.type)
+      const isXLS = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 'application/vnd.ms-excel'
+      const isLt2M = file.size / 1024 / 1024 < 2
+      if (!isXLS) {
+        this.$message.error('上传文件只能是xls/xlsx 格式!')
+      }
+      if (!isLt2M) {
+        this.$message.error('上传文件不能超过 2MB!')
+      }
+      return isXLS && isLt2M
     }
   }
 }
@@ -178,5 +180,9 @@ export default {
 }
 .action{
   margin: 10px;
+}
+.upload-demo {
+  float: left;
+  margin-right: 10px;
 }
 </style>

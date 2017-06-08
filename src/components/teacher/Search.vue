@@ -1,7 +1,7 @@
 <template>
   <el-form :model="searchData" ref="formSearch" label-width="80px" class="form-search">
-    <el-form-item label="标题" prop="title">
-      <el-input v-model="searchData.title"></el-input>
+    <el-form-item label="账号" prop="teacher_id">
+      <el-input v-model="searchData.teacher_id"></el-input>
     </el-form-item>
     <el-form-item class="search-action">
       <el-button type="primary" @click="search">搜索</el-button>
@@ -10,25 +10,21 @@
   </el-form>
 </template>
 <script>
-import bus, {topic} from '../../common/bus.js'
+import bus, {teacher} from '../../common/bus.js'
 
 export default {
-  name: 'topic-search',
+  name: 'answer-search',
   data: function () {
     return {
-      searchData: {title: '', student_id: ''}
+      searchData: {teacher_id: ''}
     }
   },
   mounted: function () {
-    if (sessionStorage.getItem('user') !== null) {
-      let user = JSON.parse(sessionStorage.getItem('user'))
-      this.searchData.student_id = user.name
-    }
     this.search()
   },
   methods: {
     search: function () { // 点击搜索
-      bus.$emit(topic.search, Object.assign({}, this.searchData))
+      bus.$emit(teacher.search, Object.assign({}, this.searchData))
     },
     reset: function () { // 点击重置
       this.$refs['formSearch'].resetFields()

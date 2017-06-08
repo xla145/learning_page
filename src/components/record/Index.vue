@@ -2,21 +2,18 @@
   <div>
     <table-search></table-search>
     <table-list></table-list>
-    <add-or-edit></add-or-edit>
   </div>
 </template>
 
 <script>
 import tableSearch from './Search'
 import tableList from './List'
-import addOrEdit from './AddOrEdit'
 
 export default {
-  name: 'record',
+  name: 'topic',
   components: {
     tableSearch,
-    tableList,
-    addOrEdit
+    tableList
   }
 }
 </script>

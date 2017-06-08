@@ -57,7 +57,8 @@ httpIntence.interceptors.response.use(function (response) { // 如果请求配�
   response.config.showLoading && globalLoadingInstance.hide()
   return response
 }, function (error) { // 检查请求是否异常，如果异常弹出提示
-  if (error.response && error.response.status === 420) { // 后台设置了420自定义错误，此处显示具体错误原因
+  if (error.response && error.response.status === 430) { // 后台设置了420自定义错误，此处显示具体错误原因
+    console.log(error.response)
     Message.warning(decodeURI(error.response.statusText))
   } else {
     Message.error('请求数据异常，请稍后重试(' + error.message + ')')

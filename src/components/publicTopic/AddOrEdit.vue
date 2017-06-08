@@ -1,10 +1,20 @@
 <template>
-  <el-dialog title="提问管理" v-model="showForm" :close-on-click-modal=false @close="reset">
+  <el-dialog title="评论" v-model="showForm" :close-on-click-modal=false @close="reset">
+   <article>
+     <h2>{{record.title}}</h2>
+     <div class="content">{{record.content}}</div>
+     <h4>评论内容：</h4>
+     <div class="comment">
+       <ul v-for="comment in comments">
+         <li>
+           <span>用户：{{comment.student_name}} </span>
+           <p>{{comment.content}}</p>
+         </li>
+       </ul>
+     </div>
+   </article>
     <el-form ref="form" :model="form" :rules="rules" label-width="100px" label-position="right" class="form-style">
-      <el-form-item label="标题" prop="title">
-        <el-input v-model="form.title"></el-input>
-      </el-form-item>
-      <el-form-item label="提问内容" prop="content">
+      <el-form-item label="评论" prop="content">
         <el-input
           type="textarea"
           :autosize="{ minRows: 3, maxRows: 5}"
@@ -14,39 +24,32 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>
-        <el-button type="primary" @click="showForm = false">取消</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
 </template>
 
 <script>
-import bus, {answer} from '../../common/bus.js'
+import bus, {publicTopic} from '../../common/bus.js'
 import {objNullToBlank} from '../../common/utils.js'
 
 export default {
-  name: 'answerAddOrEdit',
+  name: 'publicTopicAddOrEdit',
   created: function () {
     // 监听外部查询数据事件
-    bus.$on(answer.showAddOrEdit, (id) => {
+    bus.$on(publicTopic.showAddOrEdit, (id) => {
       this.reset()
-      // this.showForm = true // 此处必须先打开弹窗，如果打开后显示的话，会影响form的重置功能
       if (id !== undefined) {
-//        this.title = '编辑话题'
         this.getData(id)
-      } else {
-//        this.title = '添加话题'
-        this.showForm = true
       }
     })
-  },
-  mounted: function () {
   },
   data: function () {
     return {
       showForm: false,
-//      title: '',
-      resetForm: {id: '', title: '', content: '', student_id: ''},
+      comments: [],
+      record: {id: '', title: '', content: ''},
+      resetForm: {topic_id: '', content: '', student_id: '', topic_title: ''},
       form: {},
       rules: {
         content: [
@@ -61,9 +64,14 @@ export default {
   },
   methods: {
     getData: function (id) {
-      this.$http.post('/manage/answer/info', {id: id}).then((response) => {
+      this.comments = []
+      this.$http.post('/manage/record/info', {id: id}).then((response) => {
+        this.comments = response.data
+      })
+      this.$http.post('/manage/topic/info', {id: id}).then((response) => {
         this.showForm = true
-        this.form = Object.assign({}, this.resetForm, objNullToBlank(response.data))
+        this.record = Object.assign({}, objNullToBlank(response.data))
+        this.form = Object.assign({}, this.resetForm, {content: '', topic_id: response.data.id, topic_title: response.data.title, student_id: response.data.student_id, student_name: response.data.student_name})
       })
     },
     onSubmit: function () {
@@ -73,14 +81,10 @@ export default {
           let user = JSON.parse(sessionStorage.getItem('user'))
           this.form.student_id = user.name
         }
-        this.$http.post('/manage/answer/save', this.form, {showLoading: true}).then((response) => {
-          this.showForm = false
+        this.$http.post('/manage/record/save', this.form, {showLoading: true}).then((response) => {
           if (this.form.id !== '') { // 编辑完成（刷新列表当前页）
-            this.$message({type: 'success', message: '编辑数据成功'})
-            bus.$emit(answer.refreshListForEdit, this.form)
-          } else { // 新增完成（跳到第一页）
-            this.$message({type: 'success', message: '添加数据成功'})
-            bus.$emit(answer.refreshListForAdd, this.form)
+            this.$message({type: 'success', message: '评论成功'})
+            this.comments.push({student_name: this.form.student_name, content: this.form.content})
           }
         })
       })
@@ -97,4 +101,11 @@ export default {
 </script>
 
 <style scoped>
+  .comment {
+    border: 1px solid #dedddd;
+    border-radius: 4px;
+  }
+  .form-style{
+    margin-top: 20px;
+  }
 </style>

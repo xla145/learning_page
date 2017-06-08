@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="话题管理" v-model="showForm" :close-on-click-modal=false @close="reset">
+  <el-dialog title="话题管理" v-model="showForm" :close-on-click-modal=false @close="reset" >
     <el-form ref="form" :model="form" :rules="rules" label-width="100px" label-position="right" class="form-style">
       <el-form-item label="标题" prop="title">
         <el-input v-model="form.title"></el-input>
@@ -7,16 +7,16 @@
       <el-form-item label="资讯内容" prop="content">
         <el-input
           type="textarea"
-          autosize
+          :autosize="{ minRows: 3, maxRows: 5}"
           placeholder="请输入内容"
           v-model="form.content">
         </el-input>
       </el-form-item>
-    </el-form>
     <el-form-item>
       <el-button type="primary" @click="onSubmit">确定</el-button>
       <el-button type="primary" @click="showForm = false">取消</el-button>
     </el-form-item>
+    </el-form>
   </el-dialog>
 </template>
 
@@ -25,28 +25,22 @@ import bus, {topic} from '../../common/bus.js'
 import {objNullToBlank} from '../../common/utils.js'
 
 export default {
-  name: 'topicAddOrEdit',
+  name: 'topic-AddOrEdit',
+//  props: ['value', 'editRowId'],
   created: function () {
-    // 监听外部查询数据事件
-    bus.$on(topic.showAddOrEdit, (id) => {
+    bus.$on(topic.showAddOrEdit, (id) => { // 监听外部查询数据事件
       this.reset()
-      // this.showForm = true // 此处必须先打开弹窗，如果打开后显示的话，会影响form的重置功能
       if (id !== undefined) {
-//        this.title = '编辑话题'
         this.getData(id)
       } else {
-//        this.title = '添加话题'
         this.showForm = true
       }
     })
   },
-  mounted: function () {
-  },
   data: function () {
     return {
       showForm: false,
-//      title: '',
-      resetForm: {id: '', title: '', content: ''},
+      resetForm: {id: '', title: '', content: '', student_id: ''},
       form: {},
       rules: {
         content: [
@@ -60,15 +54,13 @@ export default {
     }
   },
   methods: {
-    getData: function (id) {
-      this.$http.post('/manage/topic/info', {id: id}).then((response) => {
-        this.showForm = true
-        this.form = Object.assign({}, this.resetForm, objNullToBlank(response.data))
-      })
-    },
     onSubmit: function () {
       this.$refs['form'].validate((valid) => {
         if (!valid) { return false }
+        if (sessionStorage.getItem('user') !== null) {
+          let user = JSON.parse(sessionStorage.getItem('user'))
+          this.form.student_id = user.name
+        }
         this.$http.post('/manage/topic/save', this.form, {showLoading: true}).then((response) => {
           this.showForm = false
           if (this.form.id !== '') { // 编辑完成（刷新列表当前页）
@@ -87,6 +79,13 @@ export default {
         this.$refs['form'].resetFields()
       }
       this.form = Object.assign({}, this.resetForm)
+    },
+    getData: function (id) {
+      this.reset()
+      this.$http.post('/manage/topic/info', {id: id}).then((response) => {
+        this.showForm = true
+        this.form = Object.assign({}, this.resetForm, objNullToBlank(response.data))
+      })
     }
   }
 }

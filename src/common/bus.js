@@ -2,14 +2,15 @@ import Vue from 'vue'
 
 export const topic = {
   search: 'topic-search',
-  showAdd: 'topic-showAdd',
+  showAddOrEdit: 'topic-showAddOrEdit',
+  refreshListForEdit: 'answer-refreshListForEdit',
   refreshListForAdd: 'topic-refreshListForAdd'
 }
-export const setting = {
-  search: 'setting-search',
-  showAddOrEdit: 'setting-showAddOrEdit',
-  refreshListForAdd: 'setting-refreshListForAdd',
-  refreshListForEdit: 'setting-refreshListForEdit'
+export const answer = {
+  search: 'answer-search',
+  showAddOrEdit: 'answer-showAddOrEdit',
+  refreshListForAdd: 'answer-refreshListForAdd',
+  refreshListForEdit: 'answer-refreshListForEdit'
 }
 export const message = {
   search: 'message-search',
@@ -17,31 +18,28 @@ export const message = {
   refreshListForAdd: 'message-refreshListForAdd',
   refreshListForEdit: 'message-refreshListForEdit'
 }
-export const newsRecommend = {
-  search: 'newsRecommend-search',
-  showAddOrEdit: 'newsRecommend-showAddOrEdit',
-  refreshListForAdd: 'newsRecommend-refreshListForAdd',
-  refreshListForEdit: 'newsRecommend-refreshListForEdit'
+export const reply = {
+  search: 'reply-search',
+  showAddOrEdit: 'reply-showAddOrEdit',
+  refreshListForAdd: 'reply-refreshListForAdd',
+  refreshListForEdit: 'reply-refreshListForEdit'
 }
-export const gameBanner = {
-  search: 'gameBanner-search',
-  showAddOrEdit: 'gameBanner-showAddOrEdit',
-  refreshListForAdd: 'gameBanner-refreshListForAdd',
-  refreshListForEdit: 'gameBanner-refreshListForEdit'
+export const record = {
+  search: 'reply-search'
 }
-export const comment = {
-  search: 'comment-search',
-  showCheck: 'comment-showCheck',
-  refreshListForCheck: 'comment-refreshListForCheck'
+export const publicTopic = {
+  search: 'publicTopic-search',
+  showAddOrEdit: 'publicTopic-showAddOrEdit',
+  refreshListForEdit: 'publicTopic-refreshListForEdit'
 }
-export const newsType = {
-  search: 'newsType-search',
-  showAdd: 'newsType-showAdd',
-  refreshListForAdd: 'newsType-refreshListForAdd'
+export const teacher = {
+  search: 'teacher-search',
+  showAddOrEdit: 'teacher-showAddOrEdit',
+  refreshListForAdd: 'teacher-refreshListForAdd'
 }
-export const gameSetting = {
-  search: 'gameSetting-search',
-  showAddOrEdit: 'gameSetting-showAddOrEdit',
-  refreshListForAdd: 'gameSetting-refreshListForAdd'
+export const student = {
+  search: 'student-search',
+  showAddOrEdit: 'student-showAddOrEdit',
+  refreshListForAdd: 'student-refreshListForAdd'
 }
 export default new Vue()

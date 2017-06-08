@@ -3,6 +3,19 @@
     <el-form-item label="标题" prop="title">
       <el-input v-model="searchData.title"></el-input>
     </el-form-item>
+    <el-form-item label="状态" prop="status">
+      <el-select v-model="searchData.status">
+        <el-option label="全部" value=''></el-option>
+        <el-option label="待答" value="0"></el-option>
+        <el-option label="已答" value="5"></el-option>
+      </el-select>
+    </el-form-item>
+    <el-form-item label="类型" prop="type">
+      <el-select v-model="searchData.type">
+        <el-option label="唯一性" value="1"></el-option>
+        <el-option label="普遍性" value="2"></el-option>
+      </el-select>
+    </el-form-item>
     <el-form-item class="search-action">
       <el-button type="primary" @click="search">搜索</el-button>
       <el-button @click="reset">重置</el-button>
@@ -10,13 +23,13 @@
   </el-form>
 </template>
 <script>
-import bus, {topic} from '../../common/bus.js'
+import bus, {reply} from '../../common/bus.js'
 
 export default {
-  name: 'topic-search',
+  name: 'answer-search',
   data: function () {
     return {
-      searchData: {title: '', student_id: ''}
+      searchData: {title: '', status: '', type: '1', student_id: ''}
     }
   },
   mounted: function () {
@@ -28,7 +41,7 @@ export default {
   },
   methods: {
     search: function () { // 点击搜索
-      bus.$emit(topic.search, Object.assign({}, this.searchData))
+      bus.$emit(reply.search, Object.assign({}, this.searchData))
     },
     reset: function () { // 点击重置
       this.$refs['formSearch'].resetFields()

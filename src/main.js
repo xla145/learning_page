@@ -5,15 +5,21 @@ import App from './App'
 import router from './router'
 // import Vuex from 'vuex'
 import ElementUI from 'element-ui'
+import './assets/main.css'
 import './assets/common.css'
 import 'element-ui/lib/theme-default/index.css'
 import axiosIntence from './common/axiosIntence'
+import {serverHost} from './common/const.js'
 
 // Vue.use(Vuex)
 
 Vue.use(ElementUI) // 加载element组件
 
 Vue.prototype.$http = axiosIntence // 设置http插件
+
+Vue.prototype._uploadStudentFilePath = serverHost + '/manage/student/bathStudentAdd'
+
+Vue.prototype._uploadTeacherFilePath = serverHost + '/manage/teacher/bathTeacherAdd'
 
 Vue.config.productionTip = false
 
@@ -83,9 +89,8 @@ new Vue({
   methods: {
     checkLogin: function () {
       // 检查是否存在session
-      console.log('>>>>>>>>>>>>>>>>>>>>>>')
       if (sessionStorage.getItem('user') === null) {
-        console.log('>>>>>>>>>>>>>>>>>>>>>>')
+        // this.$message({type: 'error', message: '获取用户信息失败，请重新刷新页面重新登录'})
         this.$router.push('/login')
       }
     }

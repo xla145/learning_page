@@ -1,16 +1,26 @@
 <template>
-  <el-dialog title="提问管理" v-model="showForm" :close-on-click-modal=false @close="reset">
+  <el-dialog title="学生管理" v-model="showForm" :close-on-click-modal=false @close="reset">
     <el-form ref="form" :model="form" :rules="rules" label-width="100px" label-position="right" class="form-style">
-      <el-form-item label="标题" prop="title">
-        <el-input v-model="form.title"></el-input>
+      <el-form-item label="姓名" prop="name">
+        <el-input v-model="form.name"></el-input>
       </el-form-item>
-      <el-form-item label="提问内容" prop="content">
-        <el-input
-          type="textarea"
-          :autosize="{ minRows: 3, maxRows: 5}"
-          placeholder="请输入内容"
-          v-model="form.content">
-        </el-input>
+      <el-form-item label="性别">
+        <el-radio-group v-model="form.sex">
+          <el-radio :label="1">男</el-radio>
+          <el-radio :label="0">女</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="手机号" prop="phone">
+        <el-input v-model="form.phone"></el-input>
+      </el-form-item>
+      <el-form-item label="学号" prop="student_id">
+        <el-input v-model="form.student_id"></el-input>
+      </el-form-item>
+      <el-form-item label="年级" prop="grade_name">
+        <el-input v-model="form.grade_name"></el-input>
+      </el-form-item>
+      <el-form-item label="班级" prop="class_name">
+        <el-input v-model="form.class_name"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>
@@ -21,15 +31,16 @@
 </template>
 
 <script>
-import bus, {answer} from '../../common/bus.js'
+import bus, {student} from '../../common/bus.js'
 import {objNullToBlank} from '../../common/utils.js'
 
 export default {
   name: 'answerAddOrEdit',
   created: function () {
     // 监听外部查询数据事件
-    bus.$on(answer.showAddOrEdit, (id) => {
+    bus.$on(student.showAddOrEdit, (id) => {
       this.reset()
+      console.log(this.form)
       // this.showForm = true // 此处必须先打开弹窗，如果打开后显示的话，会影响form的重置功能
       if (id !== undefined) {
 //        this.title = '编辑话题'
@@ -46,22 +57,31 @@ export default {
     return {
       showForm: false,
 //      title: '',
-      resetForm: {id: '', title: '', content: '', student_id: ''},
-      form: {},
+      resetForm: {id: '', name: '', class_name: '', phone: '', sex: 1, grade_name: '', student_id: ''},
+      form: {sex: '1'},
       rules: {
-        content: [
-          {required: true, message: '请输入话题内容', trigger: 'blur'}
+        name: [
+          {required: true, message: '请输入名字', trigger: 'blur'}
         ],
-        title: [
-          {required: true, message: '请输入标题', trigger: 'blur'},
-          {min: 2, max: 200, message: '长度在 2 到 200 个字符', trigger: 'blur'}
+        phone: [
+          {required: true, message: '请输入手机号', trigger: 'blur'}
+        ],
+        grade_name: [
+          {required: true, message: '请输入年级名称', trigger: 'blur'}
+        ],
+        class_name: [
+          {required: true, message: '请输入班级名称', trigger: 'blur'}
+        ],
+        student_id: [
+          {required: true, message: '请输入学号', trigger: 'blur'},
+          {min: 12, max: 12, message: '长度是12个字符', trigger: 'blur'}
         ]
       }
     }
   },
   methods: {
     getData: function (id) {
-      this.$http.post('/manage/answer/info', {id: id}).then((response) => {
+      this.$http.post('/manage/student/info', {id: id}).then((response) => {
         this.showForm = true
         this.form = Object.assign({}, this.resetForm, objNullToBlank(response.data))
       })
@@ -69,18 +89,14 @@ export default {
     onSubmit: function () {
       this.$refs['form'].validate((valid) => {
         if (!valid) { return false }
-        if (sessionStorage.getItem('user') !== null) {
-          let user = JSON.parse(sessionStorage.getItem('user'))
-          this.form.student_id = user.name
-        }
-        this.$http.post('/manage/answer/save', this.form, {showLoading: true}).then((response) => {
+        this.$http.post('/manage/student/save', this.form, {showLoading: true}).then((response) => {
           this.showForm = false
           if (this.form.id !== '') { // 编辑完成（刷新列表当前页）
             this.$message({type: 'success', message: '编辑数据成功'})
-            bus.$emit(answer.refreshListForEdit, this.form)
+            bus.$emit(student.refreshListForEdit, this.form)
           } else { // 新增完成（跳到第一页）
             this.$message({type: 'success', message: '添加数据成功'})
-            bus.$emit(answer.refreshListForAdd, this.form)
+            bus.$emit(student.refreshListForAdd, this.form)
           }
         })
       })

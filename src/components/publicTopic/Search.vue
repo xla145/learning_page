@@ -10,25 +10,21 @@
   </el-form>
 </template>
 <script>
-import bus, {topic} from '../../common/bus.js'
+import bus, {publicTopic} from '../../common/bus.js'
 
 export default {
-  name: 'topic-search',
+  name: 'answer-search',
   data: function () {
     return {
-      searchData: {title: '', student_id: ''}
+      searchData: {title: ''}
     }
   },
   mounted: function () {
-    if (sessionStorage.getItem('user') !== null) {
-      let user = JSON.parse(sessionStorage.getItem('user'))
-      this.searchData.student_id = user.name
-    }
     this.search()
   },
   methods: {
     search: function () { // 点击搜索
-      bus.$emit(topic.search, Object.assign({}, this.searchData))
+      bus.$emit(publicTopic.search, Object.assign({}, this.searchData))
     },
     reset: function () { // 点击重置
       this.$refs['formSearch'].resetFields()

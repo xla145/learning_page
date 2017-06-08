@@ -1,83 +1,88 @@
 <template>
-  <el-dialog :title="话题管理" v-model="showForm" :close-on-click-modal=false @close="reset">
-    <el-form ref="form" :model="form" :rules="rules" label-width="100px" label-position="right" class="form-style">
-      <el-form-item label="标题" prop="title">
-        <el-input v-model="form.title"></el-input>
-      </el-form-item>
-      <el-form-item label="资讯内容" prop="content">
-        <el-input
-          type="textarea"
-          autosize
-          placeholder="请输入内容"
-          v-model="form.content">
-        </el-input>
-      </el-form-item>
-    </el-form>
+  <el-form ref="form" :model="form" :rules="rules" label-width="100px" label-position="right" class="form-style">
+    <el-form-item label="原密码:" prop="oldPwd">
+      <el-input v-model="form.oldPwd" type="password"></el-input>
+    </el-form-item>
+    <el-form-item label="新密码:" prop="newPwd">
+      <el-input v-model="form.newPwd" type="password"></el-input>
+    </el-form-item>
+    <el-form-item label="再输一次" prop="checkPass">
+      <el-input v-model="form.checkPass" type="password"></el-input>
+    </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="onSubmit">确定</el-button>
       <el-button type="primary" @click="showForm = false">取消</el-button>
     </el-form-item>
-  </el-dialog>
+  </el-form>
 </template>
 
 <script>
-import bus, {topic} from '../../common/bus.js'
-import {objNullToBlank} from '../../common/utils.js'
+import bus, {message} from '../../common/bus.js'
 
 export default {
-  name: 'topicAddOrEdit',
+  name: 'messageAddOrEdit',
   created: function () {
     // 监听外部查询数据事件
-    bus.$on(topic.showAddOrEdit, (id) => {
+    bus.$on(message.showAdd, (id) => {
       this.reset()
-      // this.showForm = true // 此处必须先打开弹窗，如果打开后显示的话，会影响form的重置功能
       if (id !== undefined) {
-//        this.title = '编辑话题'
         this.getData(id)
       } else {
-//        this.title = '添加话题'
         this.showForm = true
       }
     })
   },
   mounted: function () {
+    this.reset()
   },
   data: function () {
+    var validatePass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入密码'))
+      } else {
+        if (this.form.checkPass !== '') {
+          this.$refs.form.validateField('checkPass')
+        }
+        callback()
+      }
+    }
+    var validateCheckPass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'))
+      } else if (value !== this.form.newPwd) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
     return {
       showForm: false,
-//      title: '',
-      resetForm: {id: '', title: '', content: ''},
+      resetForm: {id: '', ordPwd: '', name: '', newPwd: '', checkPass: ''},
       form: {},
       rules: {
-        content: [
-          {required: true, message: '请输入话题内容', trigger: 'blur'}
+        ordPwd: [
+          { required: true, message: '请输入原密码', trigger: 'blur' }
         ],
-        title: [
-          {required: true, message: '请输入标题', trigger: 'blur'},
-          {min: 2, max: 200, message: '长度在 2 到 200 个字符', trigger: 'blur'}
+        newPwd: [
+          { validator: validatePass, trigger: 'blur' }
+        ],
+        checkPass: [
+          { validator: validateCheckPass, trigger: 'blur' }
         ]
       }
     }
   },
   methods: {
-    getData: function (id) {
-      this.$http.post('/manage/topic/info', {id: id}).then((response) => {
-        this.showForm = true
-        this.form = Object.assign({}, this.resetForm, objNullToBlank(response.data))
-      })
-    },
     onSubmit: function () {
       this.$refs['form'].validate((valid) => {
         if (!valid) { return false }
-        this.$http.post('/manage/topic/save', this.form, {showLoading: true}).then((response) => {
+        if (sessionStorage.getItem('user') !== null) {
+          this.form.name = JSON.parse(sessionStorage.getItem('user')).name
+        }
+        this.$http.post('/manage/user/updatePwd', this.form, {showLoading: true}).then((response) => {
           this.showForm = false
-          if (this.form.id !== '') { // 编辑完成（刷新列表当前页）
-            this.$message({type: 'success', message: '编辑数据成功'})
-            bus.$emit(topic.refreshListForEdit, this.form)
-          } else { // 新增完成（跳到第一页）
-            this.$message({type: 'success', message: '添加数据成功'})
-            bus.$emit(topic.refreshListForAdd, this.form)
-          }
+          this.$message({type: 'success', message: '修改密码成功'})
+          this.reset()
         })
       })
     },
@@ -93,4 +98,5 @@ export default {
 </script>
 
 <style scoped>
+  .form-style{width: 600px; margin: 40px;}
 </style>
