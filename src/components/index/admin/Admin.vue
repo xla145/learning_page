@@ -8,7 +8,7 @@
         {{userName}}<i class="el-icon--right"></i>
       </span>
           <el-dropdown-menu slot="dropdown">
-            <!--<el-dropdown-item><el-button type="text" @click="userInfo">个人信息</el-button></el-dropdown-item>-->
+            <el-dropdown-item><el-button type="text" @click="userInfo">个人信息</el-button></el-dropdown-item>
             <el-dropdown-item><el-button type="text" @click="updatePwd">修改密码</el-button></el-dropdown-item>
             <el-dropdown-item><el-button type="text" @click="logout">退出登录</el-button></el-dropdown-item>
           </el-dropdown-menu>
@@ -20,8 +20,8 @@
       <!-- 左侧导航 -->
       <div class="main-left">
         <el-menu default-active="/manage/admin/student" class="el-menu-vertical-demo" :router="true">
-          <el-menu-item index="/manage/admin/student">学生管理</el-menu-item>
-          <el-menu-item index="/manage/admin/teacher">老师管理</el-menu-item>
+          <el-menu-item index="/manage/admin/student"><i class="el-icon-message">&nbsp;学生管理</i></el-menu-item>
+          <el-menu-item index="/manage/admin/teacher"><i class="el-icon-setting">&nbsp;老师管理</i></el-menu-item>
         </el-menu>
       </div>
       <!-- 右侧主内容区 -->
@@ -35,14 +35,17 @@
 </template>
 
 <script>
+  import {logoutMixin} from '../../../common/mixins.js'
   export default {
     name: 'student',
+    mixins: [logoutMixin],
     data: function () {
       return {
         dialogFormVisible: false,
         headerFixed: true,
         collapsed: '',
         userName: ''
+//        imgPath: ''
       }
     },
     created: function () {
@@ -52,18 +55,11 @@
       }
     },
     methods: {
-      logout: function () {
-        this.$confirm('确认要退出登录？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          sessionStorage.clear()
-          this.$router.push({path: '/login'})
-        }).catch(() => { })
-      },
       updatePwd: function () {
         this.$router.push({path: '/manage/admin/message'})
+      },
+      info: function () {
+        this.$router.push({path: '/manage/admin/userInfo'})
       }
     }
   }

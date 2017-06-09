@@ -9,7 +9,7 @@
             <img src="../../../assets/user.png">
           </span>
           <el-dropdown-menu slot="dropdown">
-            <!--<el-dropdown-item><el-button type="text">个人信息</el-button></el-dropdown-item>-->
+            <el-dropdown-item><el-button type="text" @click="info">个人信息</el-button></el-dropdown-item>
             <el-dropdown-item><el-button type="text" @click="updatePwd">修改密码</el-button></el-dropdown-item>
             <el-dropdown-item><el-button type="text" @click="logout">退出登录</el-button></el-dropdown-item>
           </el-dropdown-menu>
@@ -20,9 +20,9 @@
       <!-- 左侧导航 -->
       <div class="main-left">
         <el-menu default-active="/manage/teacher/reply" class="el-menu-vertical-demo" :router="true">
-          <el-menu-item index="/manage/teacher/reply">回复管理</el-menu-item>
-          <el-menu-item index="/manage/teacher/record">记录管理</el-menu-item>
-          <el-menu-item index="/manage/teacher/publicTopic">所有话题</el-menu-item>
+          <el-menu-item index="/manage/teacher/reply"><i class="el-icon-message">&nbsp;回复管理</i></el-menu-item>
+          <el-menu-item index="/manage/teacher/record"><i class="el-icon-setting">&nbsp;记录管理</i></el-menu-item>
+          <el-menu-item index="/manage/teacher/publicTopic"><i class="el-icon-share">&nbsp;所有话题</i></el-menu-item>
         </el-menu>
       </div>
 
@@ -37,13 +37,16 @@
 </template>
 
 <script>
+  import {logoutMixin} from '../../../common/mixins.js'
   export default {
     name: 'student',
+    mixins: [logoutMixin],
     data: function () {
       return {
         headerFixed: true,
         collapsed: '',
         userName: ''
+//        imgPath: ''
       }
     },
     created: function () {
@@ -53,15 +56,8 @@
       }
     },
     methods: {
-      logout: function () {
-        this.$confirm('确认要退出登录？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          sessionStorage.clear()
-          this.$router.push({path: '/login'})
-        }).catch(() => { })
+      info: function () {
+        this.$router.push({path: '/manage/teacher/userInfo'})
       },
       updatePwd: function () {
         this.$router.push({path: '/manage/teacher/message'})

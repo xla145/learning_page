@@ -21,6 +21,8 @@ Vue.prototype._uploadStudentFilePath = serverHost + '/manage/student/bathStudent
 
 Vue.prototype._uploadTeacherFilePath = serverHost + '/manage/teacher/bathTeacherAdd'
 
+Vue.prototype._uploadFilePath = serverHost + '/manage/user/upload'
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
@@ -88,11 +90,15 @@ new Vue({
   },
   methods: {
     checkLogin: function () {
-      // 检查是否存在session
-      if (sessionStorage.getItem('user') === null) {
-        // this.$message({type: 'error', message: '获取用户信息失败，请重新刷新页面重新登录'})
-        this.$router.push('/login')
-      }
+      this.$http.post('/manage/user/getSessions', {showLoading: true}).then((response) => {
+        let session = response.data
+        console.log(session)
+        // 检查是否存在session
+        if (session === null) {
+          // this.$message({type: 'error', message: '获取用户信息失败，请重新刷新页面重新登录'})
+          this.$router.push('/login')
+        }
+      })
     }
   }
 })

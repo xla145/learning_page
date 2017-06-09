@@ -9,7 +9,7 @@
         <img src="../../../assets/user.png">
       </span>
           <el-dropdown-menu slot="dropdown">
-            <!--<el-dropdown-item><el-button type="text">个人信息</el-button></el-dropdown-item>-->
+            <el-dropdown-item><el-button type="text">个人信息</el-button></el-dropdown-item>
             <el-dropdown-item><el-button type="text" @click="updatePwd">修改密码</el-button></el-dropdown-item>
             <el-dropdown-item><el-button type="text" @click="logout">退出登录</el-button></el-dropdown-item>
           </el-dropdown-menu>
@@ -20,9 +20,9 @@
       <!-- 左侧导航 -->
       <div class="main-left">
         <el-menu default-active="/manage/student/topic" class="el-menu-vertical-demo" :router="true">
-          <el-menu-item index="/manage/student/topic" >个人话题管理</el-menu-item>
-          <el-menu-item index="/manage/student/answer" >在线提问</el-menu-item>
-          <el-menu-item index="/manage/student/publicTopic">所有话题</el-menu-item>
+          <el-menu-item index="/manage/student/topic" ><i class="el-icon-message">&nbsp;个人话题管理</i></el-menu-item>
+          <el-menu-item index="/manage/student/answer" ><i class="el-icon-setting">&nbsp;在线提问</i></el-menu-item>
+          <el-menu-item index="/manage/student/publicTopic"><i class="el-icon-share">&nbsp;所有话题</i></el-menu-item>
         </el-menu>
       </div>
 
@@ -37,13 +37,16 @@
 </template>
 
 <script>
+  import {logoutMixin} from '../../../common/mixins.js'
   export default {
     name: 'student',
+    mixins: [logoutMixin],
     data: function () {
       return {
         headerFixed: true,
         collapsed: '',
         userName: ''
+//        imgPath: ''
       }
     },
     created: function () {

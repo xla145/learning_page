@@ -15,6 +15,7 @@ const PublicTopic = resolve => require(['.././components/publicTopic/Index'], re
 const Message = resolve => require(['.././components/message/Index'], resolve)
 const Students = resolve => require(['../components/student/Index'], resolve)
 const Teachers = resolve => require(['../components/teacher/Index'], resolve)
+const UserInfo = resolve => require(['../components/message/ShowMessage'], resolve)
 export default new Router({
   mode: 'history',
   routes: [
@@ -31,7 +32,8 @@ export default new Router({
         { path: 'message', component: Message, name: '修改密码' },
         { path: 'topic', component: Topic, name: '讨论管理' },
         { path: 'answer', component: Answer, name: '提问' },
-        { path: 'publicTopic', component: PublicTopic, name: '所有话题' }
+        { path: 'publicTopic', component: PublicTopic, name: '所有话题' },
+        { path: 'userInfo', component: UserInfo, name: '个人信息' }
       ]
     },
     {
@@ -42,7 +44,8 @@ export default new Router({
         { path: 'message', component: Message, name: '修改密码' },
         {path: 'reply', component: Reply, name: '回复管理'},
         {path: 'record', component: Record, name: '记录管理'},
-        { path: 'publicTopic', component: PublicTopic, name: '所有话题' }
+        { path: 'publicTopic', component: PublicTopic, name: '所有话题' },
+        { path: 'userInfo', component: UserInfo, name: '个人信息' }
       ]
     },
     {
@@ -52,7 +55,8 @@ export default new Router({
       children: [
         { path: 'message', component: Message, name: '修改密码' },
         { path: 'student', component: Students, name: '学生管理' },
-        { path: 'teacher', component: Teachers, name: '老师管理' }
+        { path: 'teacher', component: Teachers, name: '老师管理' },
+        { path: 'userInfo', component: UserInfo, name: '个人信息' }
       ]
     }
   ]
